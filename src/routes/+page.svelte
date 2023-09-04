@@ -1,7 +1,55 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang=ts>
+
+	import CustomerSelectionButton from './components/CustomerSelectionButton.svelte'
+	import InvoicePreview from './components/InvoicePreview.svelte'
+	import CheckoutActions from './components/CheckoutActions.svelte';
+  	import ProductSelection from './components/ProductSelection.svelte';
+	import {Product} from './components/classes/classes';
+
+	let productList:Array<Product> = [];
+	let selectedProducts:Array<Product> = [];
+  	let invoiceType:string;
+  	let totalAmount = 0.0;
+  	let selectedCustomer = {
+    id: 1,
+    name: "luis"
+  }
+  productList.push(new Product(1,12345,"caca blanca",10.50));
+  
+  // Event handler for adding a product to the selectedProducts array
+  function addProductToCart() {
+    getTotal();
+    console.log(totalAmount);
+  }
+
+  function getTotal() {
+    let total = 0.00;
+    selectedProducts.forEach(product => {
+   total = total + product.price ;
+   totalAmount = total;
+    })
+  }
+  // Event handler for deleting the last product from selectedProducts
+  function deleteLastProduct() {
+    if (selectedProducts.length > 0) {
+      selectedProducts.pop();
+    }
+  }
+
+  // Event handler for proceeding to invoice generation
+  function proceedToInvoice() {
+    // Implement your logic to generate an invoice
+  }
+
+  // Event handler for canceling the current invoice
+  function cancelInvoice() {
+    // Implement your logic to cancel the current invoice
+  }
+
+  // Event handler for deleting all selected products
+  function deleteAllSelectedProducts() {
+    selectedProducts = [];
+  }
 </script>
 
 <svelte:head>
@@ -10,22 +58,24 @@
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
+	<CustomerSelectionButton />
+	
+    <InvoicePreview 
+    	bind:totalAmount={totalAmount}
+    	bind:selectedCustomer={selectedCustomer}
+    	bind:invoiceType={invoiceType}/>
 
-		to your new<br />SvelteKit app
-	</h1>
+    <CheckoutActions
+    	on:deleteLastProduct={deleteLastProduct}
+    	on:proceedToInvoice={proceedToInvoice}
+    	on:cancelInvoice={cancelInvoice}
+    	on:deleteAllSelectedProducts={deleteAllSelectedProducts}/>
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+    <ProductSelection 
+    	bind:selectedProducts={selectedProducts}
+    	bind:productList={productList}
+    	on:addProductToCart={addProductToCart} 
+		/>
 </section>
 
 <style>
@@ -36,24 +86,4 @@
 		align-items: center;
 		flex: 0.6;
 	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
+ </style>
